@@ -44,6 +44,12 @@ variable "observability_platform" {
   }
 }
 
+variable "deploy_observability_layer" {
+  type        = bool
+  description = "Sequencement en 2 temps : false = Etape 1 (infra + Easy Trade seuls), true = Etape 2 (ajoute la couche d'observabilite + rollout restart)."
+  default     = false
+}
+
 # --- Key Vault persistant (credentials Splunk / Dynatrace) ------------------
 
 variable "key_vault_name" {

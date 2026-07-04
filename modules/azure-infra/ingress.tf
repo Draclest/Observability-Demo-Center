@@ -22,6 +22,17 @@ resource "helm_release" "ingress_nginx" {
     value = "LoadBalancer"
   }
 
+  # Utilise l'IP publique statique pre-allouee (dans le RG de la demo).
+  set {
+    name  = "controller.service.loadBalancerIP"
+    value = azurerm_public_ip.ingress.ip_address
+  }
+
+  set {
+    name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-resource-group"
+    value = azurerm_resource_group.demo.name
+  }
+
   # Sonde de sante Azure LB sur le endpoint healthz de NGINX.
   set {
     name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-health-probe-request-path"
@@ -39,6 +50,7 @@ resource "helm_release" "ingress_nginx" {
 
   depends_on = [
     azurerm_kubernetes_cluster_node_pool.easytrade,
+    azurerm_role_assignment.aks_ingress_ip,
   ]
 }
 

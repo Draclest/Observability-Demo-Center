@@ -72,3 +72,8 @@ output "cluster_issuer_name" {
   description = "ClusterIssuer cert-manager pour le TLS auto-signe."
   value       = "selfsigned-issuer"
 }
+
+output "ingress_public_ip" {
+  description = "IP publique statique de l'Ingress Controller."
+  value       = azurerm_public_ip.ingress.ip_address
+}
