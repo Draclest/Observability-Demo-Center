@@ -1,0 +1,30 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Variables locales potentiellement sensibles
+*.auto.tfvars
+# On conserve l'exemple versionne, mais pas les copies locales renseignees
+environments/**/*.local.tfvars
+
+# Kubeconfig / secrets exportes
+kubeconfig
+*.kubeconfig
+*.pem
+*.key
+
+# OS / editeurs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

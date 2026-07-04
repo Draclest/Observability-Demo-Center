@@ -1,0 +1,29 @@
+<#
+    Runbook d'auto-destroy — Demo Center Observabilite
+
+    Supprime le resource group de la demo apres expiration du TTL, comme
+    garde-fou si la demo n'a pas ete detruite manuellement.
+
+    N'utilise AUCUN module PowerShell externe : le token de l'identite manageree
+    est obtenu via le endpoint d'identite d'Azure Automation, et la suppression
+    du resource group se fait via l'API REST Azure Resource Manager. Cela evite
+    toute dependance de module a importer dans le compte Automation.
+#>
+
+$ErrorActionPreference = "Stop"
+
+$subscriptionId    = "${subscription_id}"
+$resourceGroupName = "${resource_group_name}"
+
+Write-Output "Recuperation du token de l'identite manageree..."
+$tokenAuthUri = "$env:IDENTITY_ENDPOINT?resource=https://management.azure.com/&api-version=2019-08-01"
+$tokenResponse = Invoke-RestMethod -Method GET -Uri $tokenAuthUri `
+    -Headers @{ "X-IDENTITY-HEADER" = $env:IDENTITY_HEADER; "Metadata" = "true" }
+$accessToken = $tokenResponse.access_token
+
+Write-Output "Suppression du resource group '$resourceGroupName' (asynchrone)..."
+$deleteUri = "https://management.azure.com/subscriptions/$subscriptionId/resourcegroups/$resourceGroupName`?api-version=2021-04-01"
+Invoke-RestMethod -Method DELETE -Uri $deleteUri `
+    -Headers @{ Authorization = "Bearer $accessToken" }
+
+Write-Output "Demande de suppression envoyee pour '$resourceGroupName'."
